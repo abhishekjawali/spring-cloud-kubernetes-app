@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: ConfigMap
+data:
+  mysql.db.url: jdbc:mysql://reference-app-mysql:3306/testdb?useSSL=false&serverTimezone=UTC&useLegacyDatetimeCode=false
+  product.message: This is from ConfigMap!
+metadata:
+  creationTimestamp: null
+  name: product-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-app
+spec:
+  selector:
+    matchLabels:
+      app: product-app
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: product-app
+    spec:
+      containers:
+        - name: product-app
+          image: abhishekjv/product-service:v3
+          imagePullPolicy: Always
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: kubernetes
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-user-pass
+                  key: username
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-user-pass
+                  key: password
+            - name: SPRING_DATASOURCE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: product-service
+                  key: mysql.db.url
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: product-app-service
+spec:
+  selector:
+    app: product-app
+  ports:
+    - name: http
+      port: 8080
+      nodePort: 30080
+  type: NodePort
+---
+
