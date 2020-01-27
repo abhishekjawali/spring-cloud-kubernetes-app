@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: product-service
+  cloud:    kubernetes:      config:        name: product-service
+        namespace: default
+        sources:        - name: product-service
+      reload:        enabled: true
+        strategy: refresh
+        #mode: polling
+        #period: 10000
+  
+  
+  datasource:
+    initialization-mode: always
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+      
