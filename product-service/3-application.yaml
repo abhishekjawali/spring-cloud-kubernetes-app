@@ -23,8 +23,8 @@ spec:
     spec:
       containers:
         - name: product-app
-          image: abhishekjv/product-service:v3
-          imagePullPolicy: Always
+          image: abhishekjv/product-service:v1
+          imagePullPolicy: IfNotPresent
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: kubernetes
